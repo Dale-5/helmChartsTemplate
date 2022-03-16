@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Name }}
+  name: {{ .Release.Name }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - image: k8s-backend
+          imagePullPolicy: Always
+          name: server-check-backend
+          resources: {}
+      restartPolicy: Always
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ .Release.Name }}
+            items:
+            - key: default.conf
+              path: default.conf
+      serviceAccountName: {{ .Release.Name }}
